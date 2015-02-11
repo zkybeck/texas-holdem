@@ -1,0 +1,6 @@
+Debug/
+*.xml
+*.suo
+*.v12.suo
+*.user
+*.filters
