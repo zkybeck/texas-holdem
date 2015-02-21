@@ -6,23 +6,15 @@ string cardSuits[] = { " of Spades", " of Clubs", " of Hearts", " of Diamonds" }
 
 string Card::shortName() {
 	string cardName = "";
-	cardName += cardShortName[(int)Type];
-	cardName += (char)Suit;
+	cardName += cardShortName[(int)type];
+	cardName += (char)suit;
 	return cardName;
 }
 
 string Card::longName() {
-	string cardName = cardTypes[(int)Type];
-	cardName += cardSuits[(int)Suit];
+	string cardName = cardTypes[(int)type];
+	cardName += cardSuits[(int)suit];
 	return cardName;
-}
-
-CardDeck::CardDeck() {
-	InitCards();
-}
-
-bool CompareRandomIndex(const Card* a, const Card* b) {
-	return(a->RandomIndex < b->RandomIndex);
 }
 
 Card* CardDeck::DealCard() {
@@ -83,7 +75,7 @@ FOUND_CARD:
 
 FOUND_SUIT:
 	for (i = 0; i<52; i++) {
-		if ((mh_Cards[i].Type == type) && (mh_Cards[i].Suit == suit)) {
+		if ((mh_Cards[i].type == type) && (mh_Cards[i].suit == suit)) {
 			return &mh_Cards[i];
 		}
 	}
@@ -99,14 +91,13 @@ void CardDeck::InitCards() {
 			char index = j + (i * 13);
 
 			switch (i) {
-				case 0:mh_Cards[index].Suit = CSE_SPADES; break;
-				case 1:mh_Cards[index].Suit = CSE_CLUBS; break;
-				case 2:mh_Cards[index].Suit = CSE_HEARTS; break;
-				case 3:mh_Cards[index].Suit = CSE_DIAMONDS; break;
+				case 0:mh_Cards[index].suit = CSE_SPADES; break;
+				case 1:mh_Cards[index].suit = CSE_CLUBS; break;
+				case 2:mh_Cards[index].suit = CSE_HEARTS; break;
+				case 3:mh_Cards[index].suit = CSE_DIAMONDS; break;
 			}
 
-			mh_Cards[index].Type = (CardType)j;
-			mh_Cards[index].Index = index;
+			mh_Cards[index].type = (CardType)j;
 		}
 	}
 }
@@ -132,10 +123,13 @@ void CardDeck::Shuffle() {
 		if (j != randoms.size())goto NEW_RANDOM_PLZ;
 		randoms.push_back(random);
 
-		mh_Cards[i].RandomIndex = random;
+		mh_Cards[i].sortIndex = random;
 		Cards.push_back(&mh_Cards[i]);
 	}
-	sort(Cards.begin(), Cards.end(), CompareRandomIndex);
+
+	sort(Cards.begin(), Cards.end(), [](const Card* a, const Card* b) -> bool {
+		return(a->sortIndex < b->sortIndex);
+	});
 
 	//shuffle 6 additional times
 	for (i = 0; i<6; i++) {
@@ -151,8 +145,11 @@ void CardDeck::Shuffle() {
 			if (k != randoms.size())goto NEW_RANDOM_PLS;
 			randoms.push_back(random);
 
-			Cards[j]->RandomIndex = random;
+			Cards[j]->sortIndex = random;
 		}
-		sort(Cards.begin(), Cards.end(), CompareRandomIndex);
+
+		sort(Cards.begin(), Cards.end(), [](const Card* a, const Card* b) -> bool {
+			return(a->sortIndex < b->sortIndex);
+		});
 	}
 }

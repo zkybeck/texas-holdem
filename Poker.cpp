@@ -193,14 +193,14 @@ void Poker::ScoreHand(PokerHand& ah_Hand, Card* ap_Card1, Card* ap_Card2, Card* 
 	for (i = 0; i<7; i++) {
 		//keep track of high card
 		for (j = 0; j<5; j++) {
-			if (p[i]->Type > ah_Hand.high[j]) {
+			if (p[i]->type > ah_Hand.high[j]) {
 				memmove(ah_Hand.high + j + 1, ah_Hand.high + j, (4 - j)*sizeof(int));
-				ah_Hand.high[j] = p[i]->Type;
+				ah_Hand.high[j] = p[i]->type;
 				break;
 			}
 		}
 		//card count
-		count2[p[i]->Type]++;
+		count2[p[i]->type]++;
 	}
 
 	//score cards
@@ -314,10 +314,10 @@ void Poker::ScoreHand(PokerHand& ah_Hand, Card* ap_Card1, Card* ap_Card2, Card* 
 
 	//general count
 	for (i = 0; i<7; i++) {
-		if (p[i] && p[i]->Suit == CSE_SPADES)count[0]++;
-		if (p[i] && p[i]->Suit == CSE_CLUBS)count[1]++;
-		if (p[i] && p[i]->Suit == CSE_HEARTS)count[2]++;
-		if (p[i] && p[i]->Suit == CSE_DIAMONDS)count[3]++;
+		if (p[i] && p[i]->suit == CSE_SPADES) count[0]++;
+		if (p[i] && p[i]->suit == CSE_CLUBS) count[1]++;
+		if (p[i] && p[i]->suit == CSE_HEARTS) count[2]++;
+		if (p[i] && p[i]->suit == CSE_DIAMONDS) count[3]++;
 	}
 	//flush?
 	for (i = 0; i<4; i++) {
@@ -338,13 +338,13 @@ void Poker::ScoreHand(PokerHand& ah_Hand, Card* ap_Card1, Card* ap_Card2, Card* 
 
 		//find the flush high cards
 		for (i = 0; i<7; i++) {
-			if (p[i]->Suit != flushtype)continue;
+			if (p[i]->suit != flushtype)continue;
 
 			//keep track of high card
 			for (j = 0; j<5; j++) {
-				if (p[i]->Type > ah_Hand.high[j]) {
+				if (p[i]->type > ah_Hand.high[j]) {
 					memmove(ah_Hand.high + j + 1, ah_Hand.high + j, (4 - j)*sizeof(int));
-					ah_Hand.high[j] = p[i]->Type;
+					ah_Hand.high[j] = p[i]->type;
 					break;
 				}
 			}
@@ -366,18 +366,18 @@ void Poker::ScoreHand(PokerHand& ah_Hand, Card* ap_Card1, Card* ap_Card2, Card* 
 
 		//gather info; Suit count per card type
 		for (i = 0; i<7; i++) {
-			switch (p[i]->Suit) {
+			switch (p[i]->suit) {
 				case CSE_SPADES:
-					count3[p[i]->Type][0]++;
+					count3[p[i]->type][0]++;
 					break;
 				case CSE_CLUBS:
-					count3[p[i]->Type][1]++;
+					count3[p[i]->type][1]++;
 					break;
 				case CSE_HEARTS:
-					count3[p[i]->Type][2]++;
+					count3[p[i]->type][2]++;
 					break;
 				case CSE_DIAMONDS:
-					count3[p[i]->Type][3]++;
+					count3[p[i]->type][3]++;
 					break;
 			}
 		}
@@ -419,8 +419,8 @@ void Poker::ScoreHand(PokerHand& ah_Hand, Card* ap_Card1, Card* ap_Card2, Card* 
 }
 
 void Poker::UnloadPlayers() {
-	for (int i = 0; i<mv_Players.size(); i++) {
-		delete mv_Players[i];
+	for (int i = 0; i<players.size(); i++) {
+		delete players[i];
 	}
-	mv_Players.clear();
+	players.clear();
 }

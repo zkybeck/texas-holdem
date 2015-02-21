@@ -5,7 +5,7 @@ void TexasHoldem::Load(char* apsz_Data, int ai_Length) {
 	int i, j, k, l, m;
 
 	UnloadPlayers();
-	mh_Cards.Cards.clear();
+	deck.Cards.clear();
 
 	d.LoadXML(apsz_Data, ai_Length);
 
@@ -18,19 +18,19 @@ void TexasHoldem::Load(char* apsz_Data, int ai_Length) {
 
 				if (!_strcmpi(y->Name.c_str(), "STATE")) {
 					if (!_strcmpi(y->InnerText.c_str(), "NONE")) {
-						me_State = THSE_NONE;
+						state = THSE_NONE;
 					}
 					if (!_strcmpi(y->InnerText.c_str(), "DEALT")) {
-						me_State = THSE_DEALT;
+						state = THSE_DEALT;
 					}
 					if (!_strcmpi(y->InnerText.c_str(), "FLOP")) {
-						me_State = THSE_FLOP;
+						state = THSE_FLOP;
 					}
 					if (!_strcmpi(y->InnerText.c_str(), "TURN")) {
-						me_State = THSE_TURN;
+						state = THSE_TURN;
 					}
 					if (!_strcmpi(y->InnerText.c_str(), "RIVER")) {
-						me_State = THSE_RIVER;
+						state = THSE_RIVER;
 					}
 				}
 
@@ -43,19 +43,19 @@ void TexasHoldem::Load(char* apsz_Data, int ai_Length) {
 						XmlNode* z = y->ChildNodes().Item(k);
 
 						if (!_strcmpi(z->Name.c_str(), "FLOP1")) {
-							flop1 = mh_Cards.GetCardFromString(z->InnerText.c_str());
+							flop1 = deck.GetCardFromString(z->InnerText.c_str());
 						}
 						if (!_strcmpi(z->Name.c_str(), "FLOP2")) {
-							flop2 = mh_Cards.GetCardFromString(z->InnerText.c_str());
+							flop2 = deck.GetCardFromString(z->InnerText.c_str());
 						}
 						if (!_strcmpi(z->Name.c_str(), "FLOP3")) {
-							flop3 = mh_Cards.GetCardFromString(z->InnerText.c_str());
+							flop3 = deck.GetCardFromString(z->InnerText.c_str());
 						}
 						if (!_strcmpi(z->Name.c_str(), "TURN")) {
-							turn = mh_Cards.GetCardFromString(z->InnerText.c_str());
+							turn = deck.GetCardFromString(z->InnerText.c_str());
 						}
 						if (!_strcmpi(z->Name.c_str(), "RIVER")) {
-							river = mh_Cards.GetCardFromString(z->InnerText.c_str());
+							river = deck.GetCardFromString(z->InnerText.c_str());
 						}
 					}
 				}
@@ -65,8 +65,8 @@ void TexasHoldem::Load(char* apsz_Data, int ai_Length) {
 						XmlNode* z = y->ChildNodes().Item(k);
 
 						if (!_strcmpi(z->Name.c_str(), "CARD")) {
-							Card* card = mh_Cards.GetCardFromString(z->InnerText.c_str());
-							if (card)mh_Cards.Cards.push_back(card);
+							Card* card = deck.GetCardFromString(z->InnerText.c_str());
+							if (card) deck.Cards.push_back(card);
 						}
 					}
 				}
@@ -172,14 +172,14 @@ void TexasHoldem::Load(char* apsz_Data, int ai_Length) {
 
 										zzz = zz->ChildNodes().Item(m);
 										if (!_strcmpi(zzz->Name.c_str(), "CARD")) {
-											Card* card = mh_Cards.GetCardFromString(zzz->InnerText.c_str());
+											Card* card = deck.GetCardFromString(zzz->InnerText.c_str());
 											if (card)p->cards[m] = card;
 										}
 									}
 								}
 							}
 
-							mv_Players.push_back(p);
+							players.push_back(p);
 						}
 					}
 				}
@@ -188,8 +188,8 @@ void TexasHoldem::Load(char* apsz_Data, int ai_Length) {
 	}
 
 	//sort players in order of their ID (just in case)
-	if (mv_Players.size()>0) {
-		sort(mv_Players.begin(), mv_Players.end(), Player::ComparePlayer);
+	if (players.size()>0) {
+		sort(players.begin(), players.end(), Player::ComparePlayer);
 	}
 
 	return;
@@ -218,7 +218,7 @@ char* TexasHoldem::Save(int* ap_Length) {
 	//state
 	x = new XmlNode();
 	x->Name = "State";
-	x->InnerText = stateNames[(int)me_State];
+	x->InnerText = stateNames[(int)state];
 	root->ChildNodes().AddNode(x);
 
 	//amount to call
@@ -272,10 +272,10 @@ char* TexasHoldem::Save(int* ap_Length) {
 	//card deck
 	cards = new XmlNode();
 	cards->Name = "CardDeck";
-	for (i = 0; i<mh_Cards.Cards.size(); i++) {
+	for (i = 0; i<deck.Cards.size(); i++) {
 		x = new XmlNode();
 		x->Name = "Card";
-		x->InnerText = mh_Cards.Cards[i]->longName();
+		x->InnerText = deck.Cards[i]->longName();
 		cards->ChildNodes().AddNode(x);
 	}
 	root->ChildNodes().AddNode(cards);
@@ -285,9 +285,9 @@ char* TexasHoldem::Save(int* ap_Length) {
 	players->Name = "Players";
 	root->ChildNodes().AddNode(players);
 
-	for (i = 0; i<mv_Players.size(); i++) {
+	for (i = 0; i<this->players.size(); i++) {
 		XmlNode* player, *hand;
-		Player*  p = mv_Players[i];
+		Player*  p = this->players[i];
 
 		player = new XmlNode();
 		player->Name = "Player";

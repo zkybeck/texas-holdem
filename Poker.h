@@ -13,8 +13,8 @@ enum PokerHandWinner {
 class Poker {
 	//members
 protected:
-	CardDeck        mh_Cards;
-	vector<Player*> mv_Players;
+	CardDeck        deck;
+	vector<Player*> players;
 
 	//methods
 protected:

@@ -86,7 +86,7 @@ public:
 class TexasHoldem : public Poker {
 	//members
 private:
-	TexasHoldemState me_State;
+	TexasHoldemState state;
 	int              mi_Dealer, sblind, bblind;
 	Card*            flop1, *flop2, *flop3, *turn, *river;
 	Pot              mh_Pot;
@@ -108,17 +108,13 @@ public:
 	char* Save(int* ap_Length);
 
 	TexasHoldem() {
-		me_State = THSE_NONE;
+		state = THSE_NONE;
 
 		//players (this is temporary; it's hard coded for now)
-		Player* p = new Player(0);
-		mv_Players.push_back(p);
-		p = new Player(1, AI_BLUFFER);
-		mv_Players.push_back(p);
-		p = new Player(2, AI_CONSERVATIVE);
-		mv_Players.push_back(p);
-		p = new Player(3, AI_SMART);
-		mv_Players.push_back(p);
+		players.push_back(new Player(0));
+		players.push_back(new Player(1, AI_BLUFFER));
+		players.push_back(new Player(2, AI_CONSERVATIVE));
+		players.push_back(new Player(3, AI_SMART));
 
 		//dealer button / blinds
 		mi_Dealer = 0;

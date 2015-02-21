@@ -3,7 +3,7 @@
 string stateNames[] = { "None", "Dealt", "Flop", "Turn", "River" };
 
 void TexasHoldem::Process() {
-	switch (me_State) {
+	switch (state) {
 		case THSE_NONE: ProcessStateNone(); break;
 		case THSE_DEALT: ProcessStateDealt(); break;
 		case THSE_FLOP: ProcessStateFlop(); break;
@@ -16,8 +16,8 @@ void TexasHoldem::ProcessBets() {
 	int i;
 
 PLACE_YOUR_BETS:
-	for (i = 0; i<mv_Players.size(); i++) {
-		Player* p = mv_Players[i];
+	for (i = 0; i<players.size(); i++) {
+		Player* p = players[i];
 
 		if (p->mb_CurrentTurn && p->me_Action != PA_ALLIN && p->me_Action != PA_FOLD) {
 			Bet* b;
@@ -68,15 +68,15 @@ PLACE_YOUR_BETS:
 			}
 
 			//next player
-			if ((i + 1)<mv_Players.size()) {
-				mv_Players[i + 1]->mb_CurrentTurn = true;
+			if ((i + 1)<players.size()) {
+				players[i + 1]->mb_CurrentTurn = true;
 			}
 		}
 	}
 
 	//ensure everyone has bet
-	for (i = 0; i<mv_Players.size(); i++) {
-		Player* p = mv_Players[i];
+	for (i = 0; i<players.size(); i++) {
+		Player* p = players[i];
 		if (p->mb_CurrentTurn) {
 			goto PLACE_YOUR_BETS;
 		}
@@ -89,47 +89,48 @@ void TexasHoldem::ProcessStateDealt() {
 	//signal the next betting player 
 	//this will change of course, depending on who stays in
 	ProcessBets();
-	mv_Players[0]->mb_CurrentTurn = true;
-	for (int i = 0; i<mv_Players.size(); i++) {
-		mv_Players[i]->me_Action = PA_NONE;
+	players[0]->mb_CurrentTurn = true;
+	for (int i = 0; i<players.size(); i++) {
+		players[i]->me_Action = PA_NONE;
 	}
 
-	//throw down flop
 	//burn
-	mh_Cards.DealCard();
-	flop1 = mh_Cards.DealCard();
-	flop2 = mh_Cards.DealCard();
-	flop3 = mh_Cards.DealCard();
+	deck.DealCard();
+
+	//throw down flop
+	flop1 = deck.DealCard();
+	flop2 = deck.DealCard();
+	flop3 = deck.DealCard();
 
 	printf("The Flop:\n%s | %s | %s\n",
 		flop1->shortName().c_str(),
 		flop2->shortName().c_str(),
 		flop3->shortName().c_str());
 
-	me_State = THSE_FLOP;
+	state = THSE_FLOP;
 }
 
 void TexasHoldem::ProcessStateFlop() {
 	//signal the next betting player 
 	//this will change of course, depending on who stays in
 	ProcessBets();
-	mv_Players[0]->mb_CurrentTurn = true;
-	for (int i = 0; i<mv_Players.size(); i++) {
-		mv_Players[i]->me_Action = PA_NONE;
+	players[0]->mb_CurrentTurn = true;
+	for (int i = 0; i<players.size(); i++) {
+		players[i]->me_Action = PA_NONE;
 	}
 
 	//burn
-	mh_Cards.DealCard();
+	deck.DealCard();
 
 	//show turn card
-	turn = mh_Cards.DealCard();
+	turn = deck.DealCard();
 	printf("The Turn:\n%s | %s | %s | %s\n", 
 		flop1->shortName().c_str(), 
 		flop2->shortName().c_str(),
 		flop3->shortName().c_str(),
 		turn->shortName().c_str());
 
-	me_State = THSE_TURN;
+	state = THSE_TURN;
 }
 
 void TexasHoldem::ProcessStateNone() {
@@ -138,11 +139,11 @@ void TexasHoldem::ProcessStateNone() {
 	bool lb_NeedsReIndex = false;
 
 	//remove players that have no chips
-	vector<Player*>::iterator it = mv_Players.begin();
-	while (it != mv_Players.end()) {
+	vector<Player*>::iterator it = players.begin();
+	while (it != players.end()) {
 		if ((*it)->mi_ChipCount == 0) {
 			delete(*it);
-			it = mv_Players.erase(it);
+			it = players.erase(it);
 			lb_NeedsReIndex = true;
 		} else {
 			++it;
@@ -151,8 +152,8 @@ void TexasHoldem::ProcessStateNone() {
 
 	//re-index player id
 	if (lb_NeedsReIndex) {
-		for (i = 0; i<mv_Players.size(); i++) {
-			Player* p = mv_Players[i];
+		for (i = 0; i<players.size(); i++) {
+			Player* p = players[i];
 			p->mi_PlayerID = i;
 		}
 	}
@@ -180,83 +181,84 @@ void TexasHoldem::ProcessStateNone() {
 
 	//deal
 	printf("Stats:\n");
-	for (i = 0; i<mv_Players.size(); i++) {
-		Player* p = mv_Players[i];
+	for (i = 0; i<players.size(); i++) {
+		Player* p = players[i];
 		printf("%dUP: CHIPS:%8d | W:%5d | L:%5d | T:%5d\n", i + 1, p->ChipCount(), p->Wins(), p->Losses(), p->Ties());
 		p->me_Action = PA_NONE;
 		//WRONG *****
 		//USE DEALER CHIP
 		if (i == 0)p->mb_CurrentTurn = true;
 	}
-	mh_Cards.Shuffle();
+	deck.Shuffle();
 
 	//deal 1st card (starting to left of dealer)
-	for (i = mi_Dealer + 1; i<mv_Players.size(); i++) {
-		Card* c = mh_Cards.DealCard();
-		mv_Players[i]->cards[0] = c;
+	for (i = mi_Dealer + 1; i<players.size(); i++) {
+		Card* c = deck.DealCard();
+		players[i]->cards[0] = c;
 	}
 	for (i = 0; i<mi_Dealer + 1; i++) {
-		Card* c = mh_Cards.DealCard();
-		mv_Players[i]->cards[0] = c;
+		Card* c = deck.DealCard();
+		players[i]->cards[0] = c;
 	}
 
 	//deal 2nd card (starting to left of dealer)
-	for (i = mi_Dealer + 1; i<mv_Players.size(); i++) {
-		Card* c = mh_Cards.DealCard();
-		mv_Players[i]->cards[1] = c;
+	for (i = mi_Dealer + 1; i<players.size(); i++) {
+		Card* c = deck.DealCard();
+		players[i]->cards[1] = c;
 	}
 	for (i = 0; i<mi_Dealer + 1; i++) {
-		Card* c = mh_Cards.DealCard();
-		mv_Players[i]->cards[1] = c;
+		Card* c = deck.DealCard();
+		players[i]->cards[1] = c;
 	}
 
 	//show player 1 cards
-	Card* p1c1 = mv_Players[0]->cards[0];
-	Card* p1c2 = mv_Players[0]->cards[1];
+	Card* p1c1 = players[0]->cards[0];
+	Card* p1c2 = players[0]->cards[1];
 	printf("Deck shuffled. Your Cards:\n%s | %s\n\n",
 		p1c1->shortName().c_str(),
 		p1c2->shortName().c_str());
-	me_State = THSE_DEALT;
+
+	state = THSE_DEALT;
 }
 
 void TexasHoldem::ProcessStateRiver() {
 	int i;
 	vector<PokerHand*> hands;
 
-	for (i = 0; i<mv_Players.size(); i++) {
-		ScoreHand(mv_Players[i]->Hand(), flop1, flop2, flop3, turn, river, mv_Players[i]->cards[0], mv_Players[i]->cards[1]);
+	for (i = 0; i<players.size(); i++) {
+		ScoreHand(players[i]->Hand(), flop1, flop2, flop3, turn, river, players[i]->cards[0], players[i]->cards[1]);
 
-		Card* p1c1 = mv_Players[i]->cards[0];
-		Card* p1c2 = mv_Players[i]->cards[1];
+		Card* p1c1 = players[i]->cards[0];
+		Card* p1c2 = players[i]->cards[1];
 		char  title[5] = { ' ', ' ', ' ', ' ', 0 };
 
 		if (i == mi_Dealer)
-			strcpy_s(title, 5, "DEAL");
-		if (i == sblind)
-			strcpy_s(title, 5, "SBLI");
-		if (i == bblind)
-			strcpy_s(title, 5, "BBLI");
+			strcpy(title, "DEAL");
+		if (i == sblind)  
+			strcpy(title, "SBLI");
+		if (i == bblind)  
+			strcpy(title, "BBLI");
 
 		printf("%dUP(%s): %s | %s\n->%s\n", i + 1, title, 
 			p1c1->shortName().c_str(),
 			p1c2->shortName().c_str(),
-			mv_Players[i]->Hand().HandName());
+			players[i]->Hand().HandName());
 	}
 
 	//find the winner(s)
-	Player** people = (Player**)malloc(mv_Players.size() * sizeof(Player*));
-	for (i = 0; i<mv_Players.size(); i++) {
-		people[i] = mv_Players[i];
-		mv_Players[i]->mb_Winner = false;
+	Player** people = (Player**)malloc(players.size() * sizeof(Player*));
+	for (i = 0; i<players.size(); i++) {
+		people[i] = players[i];
+		players[i]->mb_Winner = false;
 	}
-	CalculateWinner(people, mv_Players.size());
+	CalculateWinner(people, players.size());
 	free(people);
 
 	int winnercount = 0;
 	int winnerplayer = -1;
 
-	for (i = 0; i<mv_Players.size(); i++) {
-		if (mv_Players[i]->mb_Winner) {
+	for (i = 0; i<players.size(); i++) {
+		if (players[i]->mb_Winner) {
 			winnercount++;
 			winnerplayer = i;
 		}
@@ -264,26 +266,26 @@ void TexasHoldem::ProcessStateRiver() {
 
 	if (winnercount == 1) {
 		printf("%dUP wins\n\n", winnerplayer + 1);
-		//		mv_Players[winnerplayer]->mi_ChipCount += mi_Pot;
+		//		players[winnerplayer]->mi_ChipCount += mi_Pot;
 
-		for (i = 0; i<mv_Players.size(); i++) {
+		for (i = 0; i<players.size(); i++) {
 			if (i != winnerplayer) {
-				mv_Players[i]->mi_ChipCount--;
-				mv_Players[i]->mi_Losses++;
+				players[i]->mi_ChipCount--;
+				players[i]->mi_Losses++;
 			} else {
-				mv_Players[i]->mi_Wins++;
+				players[i]->mi_Wins++;
 			}
 		}
 	} else {
 		printf("split pot:\n");
-		for (i = 0; i<mv_Players.size(); i++) {
-			if (mv_Players[i]->mb_Winner) {
+		for (i = 0; i<players.size(); i++) {
+			if (players[i]->mb_Winner) {
 				printf("%dUP wins\n", i + 1);
 				//			mv_Players[i]->mi_ChipCount += (mi_Pot / winnercount);
-				mv_Players[i]->mi_Ties++;
+				players[i]->mi_Ties++;
 			} else {
-				mv_Players[i]->mi_ChipCount--;
-				mv_Players[i]->mi_Losses++;
+				players[i]->mi_ChipCount--;
+				players[i]->mi_Losses++;
 			}
 		}
 		printf("\n");
@@ -304,44 +306,45 @@ void TexasHoldem::ProcessStateRiver() {
 
 	mi_BetID = 0;
 
-	me_State = THSE_NONE;
+	state = THSE_NONE;
 }
 
 void TexasHoldem::ProcessStateTurn() {
 	//signal the next betting player 
 	//this will change of course, depending on who stays in
 	ProcessBets();
-	mv_Players[0]->mb_CurrentTurn = true;
-	for (int i = 0; i<mv_Players.size(); i++) {
-		mv_Players[i]->me_Action = PA_NONE;
+	players[0]->mb_CurrentTurn = true;
+	for (int i = 0; i<players.size(); i++) {
+		players[i]->me_Action = PA_NONE;
 	}
 
 	//burn
-	mh_Cards.DealCard();
+	deck.DealCard();
 
 	//show river card
-	river = mh_Cards.DealCard();
+	river = deck.DealCard();
 	printf("The River:\n%s | %s | %s | %s | %s\n\n",
 		flop1->shortName().c_str(),
 		flop2->shortName().c_str(),
 		flop3->shortName().c_str(),
 		turn->shortName().c_str(),
 		river->shortName().c_str());
-	me_State = THSE_RIVER;
+
+	state = THSE_RIVER;
 }
 
 void TexasHoldem::RotateDealerButton() {
 	//THIS LOGIC ISN"T CORRECT (I THINK?) DOUBLE CHECK
 	//rotate dealer + blinds
-	if (++mi_Dealer >= mv_Players.size()) {
+	if (++mi_Dealer >= players.size()) {
 		mi_Dealer = 0;
 	}
 
-	if (++sblind >= mv_Players.size()) {
+	if (++sblind >= players.size()) {
 		sblind = 0;
 	}
 
-	if (++bblind >= mv_Players.size()) {
+	if (++bblind >= players.size()) {
 		bblind = 0;
 	}
 }

@@ -35,36 +35,36 @@ enum CardType {
 };
 
 class Card {
+	friend class CardDeck;
+private:
+	int  sortIndex;
 public:
-	CardSuit Suit;
-	CardType Type;
-	byte Index;
-	int  RandomIndex;
+	CardSuit suit;
+	CardType type;
 
 	string shortName();
 	string longName();
 };
 
 class CardDeck {
-	//friends
 	friend class TexasHoldem;
 
-	//members
 protected:
-	Card          mh_Cards[52];
+	Card mh_Cards[52];
 public:
 	vector<Card*> Cards;
 
-	//methods
 protected:
-	void        InitCards();
+	void InitCards();
 public:
-	Card*       DealCard();
-	Card*       GetCardFromString(const char* apsz_CardName);
-	void        Randomize();
-	void        Shuffle();
+	Card* DealCard();
+	Card* GetCardFromString(const char* apsz_CardName);
+	void Randomize();
+	void Shuffle();
 
-	CardDeck();
+	CardDeck() {
+		InitCards();
+	}
 	virtual ~CardDeck() { }
 };
 
