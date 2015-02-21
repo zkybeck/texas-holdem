@@ -1,8 +1,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30110.0
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Poker", "Poker.vcxproj", "{1BB11684-DEC5-4446-BB45-67275211228B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texas-holdem", "texas-holdem.vcxproj", "{8713325C-5FB6-4E33-AFA2-34BA6F47ECAB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +10,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{1BB11684-DEC5-4446-BB45-67275211228B}.Debug|Win32.ActiveCfg = Debug|Win32
-		{1BB11684-DEC5-4446-BB45-67275211228B}.Debug|Win32.Build.0 = Debug|Win32
-		{1BB11684-DEC5-4446-BB45-67275211228B}.Release|Win32.ActiveCfg = Release|Win32
-		{1BB11684-DEC5-4446-BB45-67275211228B}.Release|Win32.Build.0 = Release|Win32
+		{8713325C-5FB6-4E33-AFA2-34BA6F47ECAB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8713325C-5FB6-4E33-AFA2-34BA6F47ECAB}.Debug|Win32.Build.0 = Debug|Win32
+		{8713325C-5FB6-4E33-AFA2-34BA6F47ECAB}.Release|Win32.ActiveCfg = Release|Win32
+		{8713325C-5FB6-4E33-AFA2-34BA6F47ECAB}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

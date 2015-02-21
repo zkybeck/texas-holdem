@@ -1,9 +1,6 @@
-//CardDeck.h
-//poker
-//------------------------------------------
 #ifndef CARDDECK_H
 #define CARDDECK_H
-//------------------------------------------
+
 #include <stdlib.h>
 #include <time.h>
 #include <vector>
@@ -11,19 +8,17 @@
 #include "xml/String.h"
 using namespace std;
 using namespace Kahnadex;
-//------------------------------------------
+
 typedef unsigned char byte;
 
-enum CardSuit
-{
-	CSE_SPADES=0x06,
-	CSE_CLUBS=0x05,
-	CSE_HEARTS=0x03,
-	CSE_DIAMONDS=0x04
+enum CardSuit {
+	CSE_SPADES = 0x06,
+	CSE_CLUBS = 0x05,
+	CSE_HEARTS = 0x03,
+	CSE_DIAMONDS = 0x04
 };
 
-enum CardType
-{
+enum CardType {
 	CTE_TWO,
 	CTE_THREE,
 	CTE_FOUR,
@@ -39,38 +34,38 @@ enum CardType
 	CTE_ACE
 };
 
-struct Card
-{
-	byte Suit;
-	byte Type;
+class Card {
+public:
+	CardSuit Suit;
+	CardType Type;
 	byte Index;
 	int  RandomIndex;
+
+	string shortName();
+	string longName();
 };
-//------------------------------------------
-class CardDeck
-{
+
+class CardDeck {
 	//friends
 	friend class TexasHoldem;
 
 	//members
-	protected:
-		Card          mh_Cards[52];
-	public:
-		vector<Card*> Cards;
-	
-	//methods
-	protected:
-		void         InitCards(void);
-	public:
-		Card*        DealCard(void);
-		Card*        GetCardFromString(const char* apsz_CardName);
-		static char* GetCardNameShort(byte ac_Card);
-		static void  GetCardNameFull(Card* ap_Card,char* apsz_CardName);
-		void         Randomize(void);
-		void         Shuffle(void);
+protected:
+	Card          mh_Cards[52];
+public:
+	vector<Card*> Cards;
 
-		CardDeck(void);
-		virtual ~CardDeck(){}
+	//methods
+protected:
+	void        InitCards();
+public:
+	Card*       DealCard();
+	Card*       GetCardFromString(const char* apsz_CardName);
+	void        Randomize();
+	void        Shuffle();
+
+	CardDeck();
+	virtual ~CardDeck() { }
 };
-//------------------------------------------
+
 #endif

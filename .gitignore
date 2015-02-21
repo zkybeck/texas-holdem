@@ -4,3 +4,5 @@ Debug/
 *.v12.suo
 *.user
 *.filters
+*.sdf
+*.opensdf
